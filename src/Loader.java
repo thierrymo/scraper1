@@ -1,12 +1,16 @@
 import java.io.*;
+import java.net.URL;
 
 public class Loader {
 
     private String codeSource;
 
-    public Loader(String fichierCodeSource) throws IOException {
-        InputStream is = new FileInputStream("./"+fichierCodeSource);
-        InputStreamReader isr = new InputStreamReader(is);
+    public Loader(String url) throws IOException {
+        URL site = new URL(url);
+
+        String inputLine;
+
+        InputStreamReader isr = new InputStreamReader(site.openStream());
         BufferedReader buffer = new BufferedReader(isr);
 
         String line = buffer.readLine();
