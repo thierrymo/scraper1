@@ -1,7 +1,9 @@
 import java.io.*;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Dictionary;
 import java.util.Hashtable;
+import java.util.Locale;
 
 import javafx.application.Application;
 import javafx.beans.value.ChangeListener;
@@ -49,14 +51,14 @@ public class SwitchScenes extends Application {
     int decaly = 100;
     int image_size = 75;
     private String cinema;
-    public String jour;
+    public LocalDate date = LocalDate.now();
     String paris = "https://www.plandeparis.info/plans-de-paris/plan-de-paris.jpg";
+    String clap = "https://www.lebonhommepicard.fr/wp-content/uploads/2020/02/Cine%CC%81ma.jpg";
 
     @Override
     public void start(Stage primStage) throws Exception {
         stage = primStage;
         scene1 = createSceneOne();
-        //scene2 = createSceneTwo();
         stage.setScene(scene1);
         stage.show();
     }
@@ -64,8 +66,28 @@ public class SwitchScenes extends Application {
     private Scene createSceneOne() throws IOException {
 
         root1 = new Group();
+        Canvas canvas = new Canvas(height,width);
+        root1.getChildren().add(canvas);
+        GraphicsContext gc1 = canvas.getGraphicsContext2D();
+        Image image = new Image(paris);
+        gc1.drawImage( image, decalx, decaly,height-(2*decaly), width-(2*decalx));
+        Image image2 = new Image(clap,60,60,false,false);
+        ImageView pic2 = new ImageView(image2);
+        gc1.drawImage( image2, 650, 300);
+
+
 
         ArrayList<Cinema> listeCinemas = Scrap.scrapCinema();
+        int[] loc0 = new int[2];
+        loc0[0] = 650;
+        loc0[1] = 300;
+        listeCinemas.get(0).setLocalisation(loc0);
+        int[] loc1 = new int[2];
+        loc1[0] = 880;
+        loc1[1] = 480;
+        listeCinemas.get(1).setLocalisation(loc1);
+
+
         Dictionary<String, String> dicCinemas = new Hashtable<String, String>();
         for (Cinema cine : listeCinemas){
             String nomCinema = cine.getNom();
@@ -84,32 +106,60 @@ public class SwitchScenes extends Application {
                                 Cinema oldValue, Cinema newValue) {
                 if (newValue != null) {
                     cinema = newValue.getNom();
+                    gc1.drawImage( image, decalx, decaly,height-(2*decaly), width-(2*decalx));
+                    if (newValue.getLocalisation() != null){
+                        gc1.drawImage( image2, newValue.getLocalisation()[0], newValue.getLocalisation()[1]);
+                    }
+
                 }
             }
         };
 
         choiceBox.getSelectionModel().selectedItemProperty().addListener(changeListener);
 
+        ObservableList<LocalDate> oDates = FXCollections.observableArrayList();
+        Dictionary<LocalDate, Integer> dicDates = new Hashtable<LocalDate, Integer>();
+        for (int i =0 ; i<=6 ; i++){
+            LocalDate d = LocalDate.now().plusDays(i);
+            oDates.add(d);
+            dicDates.put(d,i);
+        }
+        ChoiceBox<LocalDate> choiceBox2 = new ChoiceBox<LocalDate>(oDates);
+        date = LocalDate.now();
+        choiceBox2.setValue(date); // valeur par défaut
+
+        ChangeListener<LocalDate> changeListener2 = new ChangeListener<LocalDate>() {
+            @Override
+            public void changed(ObservableValue<? extends LocalDate> observableValue, LocalDate localDate, LocalDate t1) {
+                if (t1 != null) {
+                    date = t1;
+                }
+            }
+        };
+
+        choiceBox2.getSelectionModel().selectedItemProperty().addListener(changeListener2);
+
         HBox hBox = new HBox(choiceBox);//Add choiceBox to hBox
-        hBox.setAlignment(Pos.CENTER);//Center HBox
+        hBox.setAlignment(Pos.TOP_CENTER);
+        HBox hBox2 = new HBox(choiceBox2);
+        hBox2.setAlignment(Pos.BOTTOM_LEFT);
+
         final VBox vbox = new VBox();
         vbox.setLayoutX(90);
         vbox.setSpacing(5);
         vbox.setPadding(new Insets(35, 0, 0, 10));
-        vbox.getChildren().addAll(hBox);
-
-        Canvas canvas = new Canvas(height,width);
-        root1.getChildren().addAll(canvas,vbox);
-        GraphicsContext gc1 = canvas.getGraphicsContext2D();
-
-        Image image = new Image(paris);
-        gc1.drawImage( image, decalx, decaly,height-(2*decaly), width-(2*decalx));
-
+        vbox.getChildren().addAll(hBox,hBox2);
+        root1.getChildren().add(vbox);
 
         buttonIntro = new Button("Recherche");
         buttonIntro.setOnAction(e -> {
             try {
-                Scrap scrap = new Scrap(dicCinemas.get(cinema));
+                String url = dicCinemas.get(cinema);
+                if (dicDates.get(date) != 0) {
+                    String[] urlSplit = url.split("salle_gen");
+                    url = urlSplit[0] + "d-" + dicDates.get(date) + "/salle_gen" + urlSplit[1];
+                }
+                Scrap scrap = new Scrap(url);
                 scene2 = createSceneTwo(scrap);
                 switchScenes(scene2);
             } catch (IOException ex) {
