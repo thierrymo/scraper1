@@ -1,6 +1,5 @@
-import javafx.scene.image.ImageView;
-
 public class Cinema {
+
     private String nom;
     private String url;
     private int[] localisation;

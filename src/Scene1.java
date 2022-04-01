@@ -39,15 +39,18 @@ public class Scene1 {
 
 
         Animation animation = new Animation();
+
         AnimationTimer h = new AnimationTimer() {
-            private long lastUpdate; // Last time in which `handle()` was called
+
+            private long lastUpdate; // Last time `handle()` was called
+            int t=0;
 
             @Override
             public void start() {
                 lastUpdate = System.nanoTime();
                 super.start();
             }
-            int t=0;
+
             @Override
             public void handle(long now) {
                 long elapsedNanoSeconds = now - lastUpdate;
@@ -59,6 +62,7 @@ public class Scene1 {
                     t++;
                     lastUpdate = now;
                     if (t>50) {
+                        t=0;
                         super.stop();
                         gc1.drawImage( image, decalx, decaly,height-(2*decaly), width-(2*decalx));
                     }}
@@ -146,14 +150,16 @@ public class Scene1 {
         Button buttonIntro = new Button("Recherche");
         buttonIntro.setOnAction(e -> {
             try {
+                h.start();
+
                 String url = dicCinemas.get(Render.cinema);
                 if (dicDates.get(Render.date) != 0) {
                     String[] urlSplit = url.split("salle_gen");
                     url = urlSplit[0] + "d-" + dicDates.get(Render.date) + "/salle_gen" + urlSplit[1];
                 }
-                h.start();
+
                 Scrap scrap = new Scrap(url);
-                Scene scene2 = Render.createSceneTwo(scrap, height, width, decalx, decaly);
+                Scene scene2 = Scene2.createSceneTwo(scrap, Render.scene1, height, width, decalx, decaly, Render.image_size);
                 Render.switchScenes(scene2);
 
             } catch (IOException ex) {

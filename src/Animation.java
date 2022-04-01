@@ -22,8 +22,6 @@ public class Animation
 
     public Image getFrame(int i)
     {
-
-//        int index = (int)((time % (frames.length * duration)) / duration);
         return frames[i];
     }
 
