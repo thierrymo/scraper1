@@ -8,8 +8,6 @@ public class Loader {
     public Loader(String url) throws IOException {
         URL site = new URL(url);
 
-        String inputLine;
-
         InputStreamReader isr = new InputStreamReader(site.openStream());
         BufferedReader buffer = new BufferedReader(isr);
 
