@@ -84,14 +84,14 @@ public class Render extends Application {
 
                 // 1 second = 1,000,000,000 (1 billion) nanoseconds
                 if (elapsedNanoSeconds> 0.1e9){
-                    double elapsedSeconds = elapsedNanoSeconds / 1_000_000_000.0;
-                    gc1.drawImage(animation.getFrame(t%9), height/4, width/4);
-                    t++;
-                    lastUpdate = now;
-                    if (t>50) {
-                        super.stop();
-                        gc1.drawImage( image, decalx, decaly,height-(2*decaly), width-(2*decalx));
-                    }}
+                double elapsedSeconds = elapsedNanoSeconds / 1_000_000_000.0;
+                gc1.drawImage(animation.getFrame(t%9), height/4, width/4);
+                t++;
+                lastUpdate = now;
+                if (t>50) {
+                    super.stop();
+                    gc1.drawImage( image, decalx, decaly,height-(2*decaly), width-(2*decalx));
+                }}
             }
         };
 
@@ -221,7 +221,7 @@ public class Render extends Application {
         scrollPane.setLayoutY(decaly);
         scrollPane.setMaxSize(height,width);
 
-        // button retour   scene 2
+     // button retour   scene 2
         Button buttonBack = new Button("Retour");
         buttonBack.setOnAction(e -> {
             switchScenes(scene1);
@@ -364,6 +364,9 @@ public class Render extends Application {
 
 
 }
+
+
+
 
 
 
