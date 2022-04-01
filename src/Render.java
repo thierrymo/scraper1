@@ -3,8 +3,8 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Dictionary;
 import java.util.Hashtable;
-import java.util.Locale;
 
+import javafx.animation.AnimationTimer;
 import javafx.application.Application;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -21,35 +21,26 @@ import javafx.scene.canvas.Canvas;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
-import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
 
 
-public class SwitchScenes extends Application {
+public class Render extends Application {
 
     private Stage stage;
     private Scene scene1;
     private Group root1;
-    private Button buttonIntro;
-    private Scene scene2;
+    private Button buttonIntro;     // button recherche   scene 1
     private Group root2;
-    private Button buttonBack;
-    int height = 1200;
-    int width= 700;
-    int decalx = 100;
-    int decaly = 100;
-    int image_size = 75;
+    int height = 1200;    //  Scene size
+    int width= 700;       //  Scene size
+    int decalx = 100;     // arround the scene
+    int decaly = 100;     // arround the scene
+    int image_size = 75;     //  Film pictures size
     private String cinema;
     public LocalDate date = LocalDate.now();
     String paris = "https://www.plandeparis.info/plans-de-paris/plan-de-paris.jpg";
@@ -63,6 +54,7 @@ public class SwitchScenes extends Application {
         stage.show();
     }
 
+    // Create scene 1 with Paris map into the canvas and buttons arround
     private Scene createSceneOne() throws IOException {
 
         root1 = new Group();
@@ -75,6 +67,33 @@ public class SwitchScenes extends Application {
         ImageView pic2 = new ImageView(image2);
         gc1.drawImage( image2, 650, 300);
 
+
+        Animation animation = new Animation();
+        AnimationTimer h = new AnimationTimer() {
+            private long lastUpdate; // Last time in which `handle()` was called
+
+            @Override
+            public void start() {
+                lastUpdate = System.nanoTime();
+                super.start();
+            }
+            int t=0;
+            @Override
+            public void handle(long now) {
+                long elapsedNanoSeconds = now - lastUpdate;
+
+                // 1 second = 1,000,000,000 (1 billion) nanoseconds
+                if (elapsedNanoSeconds> 0.1e9){
+                    double elapsedSeconds = elapsedNanoSeconds / 1_000_000_000.0;
+                    gc1.drawImage(animation.getFrame(t%9), height/4, width/4);
+                    t++;
+                    lastUpdate = now;
+                    if (t>50) {
+                        super.stop();
+                        gc1.drawImage( image, decalx, decaly,height-(2*decaly), width-(2*decalx));
+                    }}
+            }
+        };
 
 
         ArrayList<Cinema> listeCinemas = Scrap.scrapCinema();
@@ -151,6 +170,9 @@ public class SwitchScenes extends Application {
         vbox.getChildren().addAll(hBox,hBox2);
         root1.getChildren().add(vbox);
 
+
+
+
         buttonIntro = new Button("Recherche");
         buttonIntro.setOnAction(e -> {
             try {
@@ -159,9 +181,11 @@ public class SwitchScenes extends Application {
                     String[] urlSplit = url.split("salle_gen");
                     url = urlSplit[0] + "d-" + dicDates.get(date) + "/salle_gen" + urlSplit[1];
                 }
+                h.start();
                 Scrap scrap = new Scrap(url);
-                scene2 = createSceneTwo(scrap);
+                Scene scene2 = createSceneTwo(scrap);
                 switchScenes(scene2);
+
             } catch (IOException ex) {
                 ex.printStackTrace();
             }
@@ -197,8 +221,8 @@ public class SwitchScenes extends Application {
         scrollPane.setLayoutY(decaly);
         scrollPane.setMaxSize(height,width);
 
-
-        buttonBack = new Button("Retour");
+        // button retour   scene 2
+        Button buttonBack = new Button("Retour");
         buttonBack.setOnAction(e -> {
             switchScenes(scene1);
         });
@@ -211,7 +235,7 @@ public class SwitchScenes extends Application {
 
         root2.getChildren().add(buttonBack);
 
-        scene2 = new Scene(root2, height, width);
+        Scene scene2 = new Scene(root2, height, width);
         scene2.setFill(Color.YELLOW);
 
         // Building the screen with film image, cliquable name and time table
@@ -234,7 +258,7 @@ public class SwitchScenes extends Application {
                     Film filmDetail = liste.get(finalNumFilm);
                     Scene scene3 = null;
                     try {
-                        scene3 = createSceneThree(filmDetail);
+                        scene3 = createSceneThree(filmDetail, scene2);
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
@@ -271,7 +295,7 @@ public class SwitchScenes extends Application {
     }
 
 
-    private Scene createSceneThree(Film film) throws IOException {
+    private Scene createSceneThree(Film film, Scene scene) throws IOException {
         Group root3 = new Group();
 
         VBox vBox= new VBox();
@@ -284,9 +308,10 @@ public class SwitchScenes extends Application {
         scrollPane.setLayoutY(decaly);
         scrollPane.setMaxSize(height,width);
 
-        buttonBack = new Button("Retour");
+        // button retour   scene 3
+        Button buttonBack = new Button("Retour");
         buttonBack.setOnAction(e -> {
-            switchScenes(scene2);
+            switchScenes(scene);
         });
 
         buttonBack.setPrefSize(150,50);
@@ -300,7 +325,7 @@ public class SwitchScenes extends Application {
         Scene scene3 = new Scene(root3, height, width);
         scene3.setFill(Color.YELLOW);
 
-        String synopsis = MethodPres(film.getSynopsis());
+        String synopsis = Presentation.MethodPres(this, film.getSynopsis());
 
         Text textTitre = new Text();
         textTitre.setFont(new Font(20));
@@ -326,24 +351,9 @@ public class SwitchScenes extends Application {
     }
 
 
-    public String MethodPres(String synopsis) {
-        final int NB_MAX = 150*height/1200;
-        StringBuilder maChaine = new StringBuilder(synopsis);
-        int index = 0;
-
-        do {
-            index = maChaine.indexOf(" ", index + NB_MAX);
-            if (index < 0) {
-                break;
-            }
-            maChaine.setCharAt(index, '\n');
-        }
-        while (true);
-        return maChaine.toString();
-
-    }
 
 
+    // 3 scenes have been built, now make it possible to switch from one to the others
     public void switchScenes (Scene scene) {
         stage.setScene (scene);
     }
