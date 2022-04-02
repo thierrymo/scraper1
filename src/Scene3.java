@@ -8,7 +8,8 @@ import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 
 import java.io.IOException;
-
+// to build the third scene where the user can see a basic description of the selected movie
+// it is going to be the same structure then scene2... no need of graphic context here neither
 public class Scene3 {
     static Scene createSceneThree(Film film, Scene scene, int height, int width, int decalx, int decaly) throws IOException {
         Group root3 = new Group();
@@ -18,12 +19,13 @@ public class Scene3 {
         vBox.setLayoutY(decaly);
         vBox.setPrefSize(height-2*decalx, width-2*decaly);
 
+        // here we needed a scrollpane to make the movie description scrallable
         ScrollPane scrollPane= new ScrollPane();
         scrollPane.setLayoutX(decalx);
         scrollPane.setLayoutY(decaly);
         scrollPane.setMaxSize(height,width);
 
-        // button retour   scene 3
+        // the return button who will bring back the user to the scene2
         Button buttonBack = new Button("Retour");
         buttonBack.setOnAction(e -> {
             Render.switchScenes(scene);
@@ -40,8 +42,10 @@ public class Scene3 {
         Scene scene3 = new Scene(root3, height, width);
         scene3.setFill(Color.YELLOW);
 
+        // here we call the Method MethodPres from Presentation class who make the text layout of the movie synopsis
         String synopsis = Presentation.MethodPres(height, film.getSynopsis());
 
+        // definition of what the user will see on this screen : movie title, the team and the basic synopsis from Allocine
         Text textTitre = new Text();
         textTitre.setFont(new Font(20));
         textTitre.setFill(Color.RED);
@@ -66,3 +70,5 @@ public class Scene3 {
     }
 
 }
+
+

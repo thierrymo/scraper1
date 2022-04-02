@@ -15,6 +15,7 @@ import javafx.scene.text.Text;
 import java.io.IOException;
 import java.util.ArrayList;
 
+// to build the second scene where the user can see all the movies and the time of the selecting date and cinema
 public class Scene2 {
     static public Scene createSceneTwo(Scrap scrap, Scene scene, int height, int width, int decalx, int decaly, int image_size) throws IOException {
         Group root2 = new Group();
@@ -24,13 +25,13 @@ public class Scene2 {
         vBox.setLayoutY(decaly);
         vBox.setPrefSize(height-2*decalx, width-2*decaly);
 
-
+        // here we needed a scrollpane to make the movies list scrallable
         ScrollPane scrollPane= new ScrollPane();
         scrollPane.setLayoutX(decalx);
         scrollPane.setLayoutY(decaly);
         scrollPane.setMaxSize(height,width);
 
-        // button retour   scene 2
+        // the return button who will bring back the user to the scene1
         Button buttonBack = new Button("Retour");
         buttonBack.setOnAction(e -> {
             Render.switchScenes(scene);
@@ -44,6 +45,7 @@ public class Scene2 {
 
         root2.getChildren().add(buttonBack);
 
+        // definition of what the user will have to the top of the screen : name of the selected cinema and date
         Text textSalle = new Text();
         textSalle.setFont(new Font(20));
         textSalle.setFill(Color.BLUEVIOLET);
@@ -56,7 +58,7 @@ public class Scene2 {
         Scene scene2 = new Scene(root2, height, width);
         scene2.setFill(Color.YELLOW);
 
-        // Building the screen with film image, cliquable name and time table
+        // Building the movies list cliquable with hyperlink
         int numFilm = -1;
         ArrayList<Film> liste = scrap.getFilmsJournee();
 
@@ -67,10 +69,9 @@ public class Scene2 {
 
             Hyperlink hyperlink = new Hyperlink(film.getTitre());
 
-
             int finalNumFilm = numFilm;
             hyperlink.setOnAction(new EventHandler<ActionEvent>() {
-
+                // the action when the user is cliquing on one the movies name
                 @Override
                 public void handle(ActionEvent event) {
                     Film filmDetail = liste.get(finalNumFilm);
@@ -84,6 +85,7 @@ public class Scene2 {
                 }
             });
 
+            // definition of what the user will see on this screen : movies poster, cliquable names, and time table
             Text text = new Text();
             text.setFont(new Font(15));
             text.setFill(Color.RED);
@@ -102,9 +104,7 @@ public class Scene2 {
             vBox.getChildren().addAll(hyperlink,text);
             vBox.getChildren().add(pic);
             vBox.getChildren().add(textSpace);
-
         }
-
         scrollPane.setContent(vBox);
         root2.getChildren().addAll(scrollPane);
 
@@ -112,3 +112,5 @@ public class Scene2 {
     }
 
 }
+
+

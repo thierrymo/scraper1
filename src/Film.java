@@ -1,10 +1,13 @@
 import java.util.ArrayList;
 
+/**
+ * Film est la classe qui définit un film.
+ * Ses instances, de type String, servent principalement à réceptionner et conserver les résultats de notre scraping.
+ */
 public class Film {
     private String titre;
     private String afficheUrl;
     private ArrayList<String> horairesJournee;
-    private String dateSortie;
     private String realisateur;
     private String equipe;
     private String synopsis;
@@ -54,14 +57,6 @@ public class Film {
         this.synopsis = synopsis;
     }
 
-    @Override
-    public String toString() {
-        return "Film{" +
-                "titre='" + titre + '\'' +
-                ", afficheUrl='" + afficheUrl + '\'' +
-                ", horairesJournee=" + horairesJournee +
-                '}';
-    }
 }
 
 
