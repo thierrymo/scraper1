@@ -5,7 +5,7 @@ import javafx.stage.Stage;
 
 /**
  * Classe principale
- * Y sont stockées des attributs :
+ * Y sont stockés des attributs :
  * <u>
  *     <li>statiques qu'on utilise dans d'autres classes,</li>
  *     <li>ou non, qu'on passera en argument de méthode en méthode</li>
